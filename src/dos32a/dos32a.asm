@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -112,7 +112,7 @@ Endif
 			;   bit 6: 0=lock configuration off, 1=on	/*
 			;   bit 7: 0=Professional, 1=Beta		/*
 dw	0200h		; DOS INT 21h buffer in low memory (in para)	/8 KB
-dw	070Ah		; Internal Version of DOS/32A: db low,high
+dw	0721h		; Internal Version of DOS/32A: db low,high
 dw	0000h		; Reserved (v7.0+)
 ;-----------------------------------------------------------------------------
 include	TEXT\oemtitle.asm

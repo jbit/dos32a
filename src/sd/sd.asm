@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -1279,8 +1279,8 @@ _old_int33sel	dd 0
 
 __idstring	db 'SUNSYS DOS/32A',0
 __message0	db 'SD/32A -- Protected Mode Debugger  '
-	 db 'Version 7.1',cr
-	 db 'Copyright (C) Supernar Systems, Ltd. 1996-2002',cre
+	 db 'Version 7.33',cr
+	 db 'Copyright (C) Supernar Systems, Ltd. 1996-2005',cre
 __error0 db 'SD/32A fatal: DOS/32 Advanced ADPMI is required!',cr
 	 db cr
 db 'Note that this program can not be run under Windows or OS/2 systems',cr

@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -97,6 +97,15 @@ _int21:	cld
 	jz	@__42h
 	cmp	ah,43h		; Change file attr:	CX, DS:EDX
 	jz	@__43h
+
+	cmp	ax,4402h	; IOCTL Read:		BX, ECX, DS:EDX
+	jz	@__4402h
+	cmp	ax,4403h	; IOCTL Write:		BX, ECX, DS:EDX
+	jz	@__4403h
+	cmp	ax,4404h	; IOCTL Read:		BX, ECX, DS:EDX
+	jz	@__4404h
+	cmp	ax,4405h	; IOCTL Write:		BX, ECX, DS:EDX
+	jz	@__4405h
 
 	cmp	ah,47h		; Get DIR:		DL, DS:ESI
 	jz	@__47h
@@ -418,41 +427,46 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 ;  In:	DS:EDX = addr, ECX = size, EBX = handle
 ;  Out:	EAX = bytes read
 ;
+@__4402h:
+@__4404h:
 @__3Fh:	push	ds
 	pop	es
 	mov	ds,cs:_sel_ds			; DS=_TEXT16
 	sub	esp,32h
 	mov	ebp,esp
 	mov	[ebp+10h],bx			; store handle in structure
+
 	mov	edi,edx				; ES:EDI=destination
 	mov	ebx,ecx				; EBX=bytes to read
 	xor	edx,edx				; EDX=counter bytes read
-	cmp	ecx,_lobufsize
-	jbe	@@low
-@@0:	mov	ax,_seg_buf
-	mov	word ptr [ebp+24h],ax		; store DS in structure
+
+@@loop:	mov	[ebp+1Ch],ax			; store AX in structure
+	mov	ax,_seg_buf
+	mov	[ebp+24h],ax			; store DS in structure
 	mov	word ptr [ebp+14h],0		; store DX in structure
-	mov	byte ptr [ebp+1Dh],3Fh		; store AH in structure
+
 	mov	eax,ebx
 	cmp	eax,_lobufsize
 	jbe	@@1
 	mov	eax,_lobufsize
 @@1:	mov	[ebp+18h],ax			; store CX in structure
-	call	int21h				; DOS read from file
+
+	call	int21h				; DOS read
 	movzx	eax,word ptr [ebp+1Ch]		; EAX=bytes read
 	test	byte ptr [ebp+20h],1		; check for error
 	jnz	@@err
-	mov	ecx,eax				; ECX=EAX for string copy
-	mov	esi,_lobufbase
-	jcxz	@@done				; if ECX=0, 0 bytes read, done
-	shr	cx,2
-	rep	movs dword ptr es:[edi],[esi]	; copy buffer
-	mov	cl,al
-	and	cl,03h
-	rep	movs byte ptr es:[edi],[esi]
+
+	test	ax,ax
+	jz	@@done				; if 0 bytes read, we're done
+
+	mov	esi,_lobufbase			; DS:ESI=source
+	call	@__cp2				; copy buffer to destination
+
 	add	edx,eax				; adjust bytes read
 	sub	ebx,eax				; adjust bytes to read
-	ja	@@0
+	mov	ax,[ebp+1Ch+32h]
+	ja	@@loop
+
 @@done:	add	esp,32h
 	mov	[esp+1Ch],edx			; store bytes count
 	jmp	@__ok
@@ -460,25 +474,6 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 	mov	[esp+1Ch],eax			; error reading, store errcode
 	jmp	@__err
 
-@@low:	mov	ax,_seg_buf
-	mov	word ptr [ebp+24h],ax		; store DS in structure
-	mov	word ptr [ebp+18h],cx		; store CX in structure
-	mov	word ptr [ebp+14h],0		; store DX in structure
-	mov	byte ptr [ebp+1Dh],3Fh		; store AH in structure
-	call	int21h				; DOS read from file
-	movzx	eax,word ptr [ebp+1Ch]		; EAX=bytes read
-	test	byte ptr [ebp+20h],1		; check for error
-	jnz	@@err
-	mov	ecx,eax				; ECX=EAX for string copy
-	mov	esi,_lobufbase
-	jcxz	@@done				; if ECX=0, 0 bytes read, done
-	shr	cx,2
-	rep	movs dword ptr es:[edi],[esi]	; copy buffer
-	mov	cl,al
-	and	cl,03h
-	rep	movs byte ptr es:[edi],[esi]
-	add	edx,eax				; adjust bytes read
-	jmp	@@done
 
 
 ;=============================================================================
@@ -486,40 +481,44 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 ;  In:	DS:EDX = addr, ECX = size, EBX = handle
 ;  Out:	EAX = bytes written
 ;
+@__4403h:
+@__4405h:
 @__40h:	mov	es,cs:_sel_ds
 	sub	esp,32h
 	mov	ebp,esp
 	mov	[ebp+10h],bx			; store handle in structure
+
 	mov	esi,edx				; DS:ESI=source
 	mov	ebx,ecx				; EBX=bytes to write
 	xor	edx,edx				; EDX=counter bytes written
-	cmp	ecx,cs:_lobufsize
-	jbe	@@low
-@@0:	mov	ax,cs:_seg_buf
-	mov	word ptr [ebp+24h],ax		; store DS in structure
+
+@@loop:	mov	[ebp+1Ch],ax			; store AX in structure
+	mov	ax,cs:_seg_buf
+	mov	[ebp+24h],ax			; store DS in structure
 	mov	word ptr [ebp+14h],0		; store DX in structure
-	mov	byte ptr [ebp+1Dh],40h		; store AH in structure
+
 	mov	eax,ebx
 	cmp	eax,cs:_lobufsize
 	jbe	@@1
 	mov	eax,cs:_lobufsize
 @@1:	mov	[ebp+18h],ax			; store CX in structure
-	mov	ecx,eax
+
 	mov	edi,cs:_lobufbase
-	jcxz	@@done
-	shr	cx,2
-	rep	movs dword ptr es:[edi],[esi]
-	mov	cl,al
-	and	cl,03h
-	rep	movs byte ptr es:[edi],[esi]
-	mov	ecx,eax				; preserve EAX in ECX
+	call	@__cp2				; copy source into buffer
+
 	call	int21h				; DOS write to file
 	movzx	eax,word ptr [ebp+1Ch]		; EAX=bytes written
 	test	byte ptr [ebp+20h],1		; check for error
 	jnz	@@err
+
+	test	ax,ax
+	jz	@@done				; if 0 bytes written, we're done
+
 	add	edx,eax				; adjust bytes written
-	sub	ebx,ecx				; adjust bytes to write
-	ja	@@0				; loop until done
+	sub	ebx,eax				; adjust bytes to write
+	mov	ax,[ebp+1Ch+32h]
+	ja	@@loop				; loop until done
+
 @@done:	add	esp,32h
 	mov	[esp+1Ch],edx			; store bytes count
 	jmp	@__ok
@@ -527,25 +526,6 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 	mov	[esp+1Ch],eax			; error writing, store errcode
 	jmp	@__err
 
-@@low:	mov	ax,cs:_seg_buf
-	mov	word ptr [ebp+24h],ax		; store DS in structure
-	mov	word ptr [ebp+18h],cx		; store CX in structure
-	mov	word ptr [ebp+14h],0		; store DX in structure
-	mov	byte ptr [ebp+1Dh],40h		; store AH in structure
-	jcxz	@@l1
-	mov	edi,cs:_lobufbase
-	mov	al,cl
-	shr	cx,2
-	rep	movs dword ptr es:[edi],[esi]
-	mov	cl,al
-	and	cl,03h
-	rep	movs byte ptr es:[edi],[esi]
-@@l1:	call	int21h				; DOS write to file
-	movzx	eax,word ptr [ebp+1Ch]		; EAX=bytes written
-	test	byte ptr [ebp+20h],1		; check for error
-	jnz	@@err
-	add	edx,eax				; adjust bytes written
-	jmp	@@done
 
 
 ;=============================================================================
@@ -1455,6 +1435,13 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 	mov	word ptr [ebp+24h],ax
 	mov	word ptr [ebp+14h],0
 	jmp	int21h
+@__cp2:	mov	ecx,eax		; copy buffer
+	shr	cx,2
+	rep	movs dword ptr es:[edi],[esi]
+	mov	cl,al
+	and	cl,03h
+	rep	movs byte ptr es:[edi],[esi]
+	ret
 @__std:	sub	esp,32h
 	mov	ebp,esp
 	mov	[ebp+04h],si			; these two pass-downs are

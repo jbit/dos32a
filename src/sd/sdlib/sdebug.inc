@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -5219,7 +5219,7 @@ restore_video:
 ;อออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
 library_string label byte
 db 10,'SD/32A -- Protected Mode Debugger Library'
-db 10,'Copyright (C) Supernar Systems, Ltd. 1996-2002'
+db 10,'Copyright (C) Supernar Systems, Ltd. 1996-2005'
 db 10,'All Rights Reserved.'
 db 10,0
 

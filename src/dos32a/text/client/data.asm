@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -211,6 +211,8 @@ _int_erravail		equ @area1_db+5Eh		;db 0
 _app_type		equ @area1_db+60h		;db 0
 _app_load		equ @area1_db+61h		;db 0
 
+_mus_esp		equ @area1_dd+64		;dd 0
+
 _app_buf_allocsel	equ @area2_dw+00h
 _app_buf_allocbase	equ @area2_dd+APP_MAXOBJECTS*2
 
@@ -223,7 +225,7 @@ If EXEC_TYPE eq 2
 Endif
 	db 'Version '
 ver_msg	db 'x.xx',cr
-	db 'Copyright (C) Supernar Systems, Ltd. 1996-2002',cr
+	db 'Copyright (C) Supernar Systems, Ltd. 1996-2005',cr
 cpr_end	label byte
 
 errmsg1	db 'DOS/32A fatal (%w): ',0
@@ -305,7 +307,7 @@ x_err3	db 'DPMI host reported an error (#%wh)'				,0
 ;=============================================================================
 w_msg1	db 'no extended memory has been allocated'			,0
 w_msg2	db 'PICs have been relocated to INT %bh, INT %bh'		,0
-w_msg3	db 'real mode interrupt vector had been modified: INT %bh'	,0
+w_msg3	db 'real mode interrupt vector has been modified: INT %bh'	,0
 w_msg4	db 'mouse initialization failed'				,0
 w_msg5	db 'object #%d contains no data or code'			,0
 w_msg6	db 'incompatible version of DOS/32A already running'		,0

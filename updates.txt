@@ -3,6 +3,40 @@
 			*******************************
 
 
+
+[2005-01-12]
+DOS/32 Advanced DOS Extender version 7.33
+=========================================
+
+DOS Extender (DOS32A.EXE):
+--------------------------
++ Bugfix: exec loader could crash the DOS Extender during startup in rare situations
++ Bugfix: DPMI function 0301h can not transfer data on stack to real mode procedure
++ Int 21h functions 4402h, 4403h, 4404h, 4405h, (DOS IOCTL) have been extended
++ Int 21h functions 3Fh & 40h (DOS IO) have been rewritten
++ mouse callback can now handle non-standard stack frames
+
+
+SUNSYS Bind Utility (SB.EXE):
+-----------------------------
++ Bugfix: minor binding problems with unbound LE/LX execs
++ removed check for DOS32A environment string
+
+
+SUNSYS Compress Utility (SC.EXE):
+---------------------------------
++ removed check for DOS32A environment string
+
+
+SUNSYS Setup Utility (SS.EXE):
+------------------------------
++ removed Lock and Version checks
+
+
+
+
+
+*******************************************************************************
 Release 8
 DOS/32 Advanced DOS Extender version 7.1
 ========================================

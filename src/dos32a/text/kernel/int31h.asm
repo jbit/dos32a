@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -983,7 +983,7 @@ int3103:				; common to 0300h, 0301h, and 0302h
 
 	std				; string copy backwards
 	sub edi,2			; copy stack parms from protected mode
-	lea esi,[ecx*2+esp+3Eh]		; stack to real mode stack
+	lea esi,[ecx*2+esp+38h]		; stack to real mode stack
 	rep movs word ptr es:[edi],ss:[esi]
 
 	mov esi,[esp+06h]		; ESI = offset of structure from stack

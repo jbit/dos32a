@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -254,7 +254,6 @@ relocate_le_object:
 	sub	ecx,esi			; calculate size of 1st tab
 	jz	@@2			; if 1st == 2nd, no fixups
 	add	esi,_app_off_fixrectab	; get Fixup Record Table Offset
-	sub	esi,_seg_ds_base
 	mov	edi,[esp]		; get current page number
 	shl	edi,12
 	add	edi,[ebp+ebx+8]		; address of page target to fix in mem
@@ -276,7 +275,6 @@ relocate_lx_object:
 	sub	ecx,esi			; calculate size of 1st tab
 	jz	@@2			; if 1st == 2nd, no fixups
 	add	esi,_app_off_fixrectab	; get Fixup Record Table Offset
-	sub	esi,_seg_ds_base
 	mov	edi,[esp+4]		; get current page number
 	shl	edi,12
 	add	edi,[ebp+ebx+8]		; address of page target to fix in mem
@@ -295,9 +293,9 @@ relocate_lx_object:
 apply_fixups:
 @@0:	push	ecx edi
 	mov	_err_code,4005h		; "unrecognized fixup data"
-	mov	cx,[esi+0]		; get SRC/FLAGS
-	movsx	edx,word ptr [esi+2]	; get SRCOFF
-	movzx	eax,word ptr [esi+4]	; get OBJNUM
+	mov	cx,gs:[esi+0]		; get SRC/FLAGS
+	movsx	edx,word ptr gs:[esi+2]	; get SRCOFF
+	movzx	eax,word ptr gs:[esi+4]	; get OBJNUM
 	add	edi,edx			; calculate dest addr to be fixed
 	test	cx,0F20h		; SrcLists/Imports not supported
 	jnz	file_errorm		; jump if one of these
@@ -319,7 +317,7 @@ apply_fixups:
 	jz	@@3			; if yes, jump
 	cmp	al,08h
 	ja	file_errorm
-	mov	eax,[esi]
+	mov	eax,gs:[esi]
 	test	cx,1000h		; check for Alias flag
 	jnz	@@2			; if not, jump
 	movzx	eax,ax

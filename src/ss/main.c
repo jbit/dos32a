@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+ * Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -44,19 +44,17 @@ void main(int argc, char *argv[])
 {
 	int n;
 
-//	Debug_Init();
-
 	memset(startdir,0,sizeof(startdir));
 	memset(cfgfilename,0,sizeof(cfgfilename));
 	ArgInit(argc, argv);
 	VideoInit();
 	ShowCopyright(argc, argv);
-	CheckIfLocked();
+//	CheckIfLocked();
 	ShowSysInfo();
 	ShowEnvInfo();
 	ShowMainMenu();
 	ShowMemory();
-	CheckVersion();
+//	CheckVersion();
 	ValidateConfig();
 
 l1:	ShowMemory();
@@ -114,7 +112,7 @@ void ArgInit(int argc, char *argv[])
 
 
 	printf("SS/32A -- Protected Mode Setup Utility  Version %s\n",version);
-	printf("Copyright (C) Supernar Systems, Ltd. 1996-2002\n");
+	printf("Copyright (C) Supernar Systems, Ltd. 1996-2005\n");
 
 l1:	if(argc<2)
 	{
@@ -245,7 +243,7 @@ void ShowCopyright(int argc, char *argv[])
 	SetColor(LIGHTBLUE);
 	Print_At(0,1,"DOS/32 Advanced.");
 	Print_At(0,67,"Version %s",version);
-	Print_At(24,16,"Copyright (C) Supernar Systems, Ltd. 1996-2002");
+	Print_At(24,16,"Copyright (C) Supernar Systems, Ltd. 1996-2005");
 
 	strcpy(buf,argv[1]);
 	strupr(buf);

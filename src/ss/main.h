@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2002 Supernar Systems, Ltd. All rights reserved.
+ * Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -175,8 +175,8 @@ extern	char keycode;
 		char	dos32a_buildtime[0x09];
 	};
 
-	char	*version =	"7.1";
-	int	version2 =	0x070A;
+	char	*version =	"7.33";
+	int	version2 =	0x0721;
 	int	changed	=	0;
 	int	hexmode =	0;
 
