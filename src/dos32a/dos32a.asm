@@ -112,7 +112,7 @@ Endif
 			;   bit 6: 0=lock configuration off, 1=on	/*
 			;   bit 7: 0=Professional, 1=Beta		/*
 dw	0200h		; DOS INT 21h buffer in low memory (in para)	/8 KB
-dw	0721h		; Internal Version of DOS/32A: db low,high
+dw	0723h		; Internal Version of DOS/32A: db low,high
 dw	0000h		; Reserved (v7.0+)
 ;-----------------------------------------------------------------------------
 include	TEXT\oemtitle.asm
@@ -293,8 +293,7 @@ enter_32bit_code:
 	call	install_nullptr_protect	; install Null-Ptr Protection
 	mov	ss,_sel32_ss		; SS = app 32bit data sel
 	mov	esp,_app_esp		; ESP = application stack
-	push	dword ptr _sel32_cs	; push 32bit destination selector
-	push	dword ptr _app_eip	; push 32bit destination offset
+
 	mov	es,_sel_es		; ES = environment sel
 	mov	fs,_sel_zero		; FS = 32bit zero sel
 	mov	ds,_sel32_ss		; DS = app 32bit data sel
@@ -307,6 +306,20 @@ enter_32bit_code:
 	xor	ebp,ebp
 	mov	gs,ax
 	sti				; enable interrupts
+
+	cmp	cs:_sys_type,3
+	jz	@@0
+	test	cs:_misc_byte2,00010000b
+	jz	@@0
+
+	pushfd
+	push	dword ptr cs:_sel32_cs	; push 32bit destination selector
+	push	dword ptr cs:_app_eip	; push 32bit destination offset
+	or	byte ptr ss:[esp+9],1	; enable tracing
+	iretd
+
+@@0:	push	dword ptr cs:_sel32_cs	; push 32bit destination selector
+	push	dword ptr cs:_app_eip	; push 32bit destination offset
 	db	66h			; do 32bit far return to entry point
 	retf
 

@@ -183,22 +183,26 @@ _mus_int_rm:
 
 _mus_int_pm:
 	cld
-	push	ss esp
 	pushad
-	push	ds es
+	push	ds es fs gs
 	xor	eax,eax
-	mov	ax,ss
-	lar	eax,eax
-	test	eax,00400000h
-	jnz	@@1
-	movzx	esp,sp
-@@1:	mov	ax,cs:_seg_ds
-	mov	word ptr es:[edi+2Ah],offs @@done
-	mov	word ptr es:[edi+2Ch],ax
+
 	mov	ax,ds
 	mov	ds,cs:_sel_ds
-	mov	dptr ds:_mus_esp,esp
+	mov	ds:_mus_esp,esp
+	mov	ds:_mus_ss,ss
 	mov	ds,ax
+
+	mov	ax,ss
+	lar	eax,eax
+	shr	eax,23
+	jc	@@1
+	movzx	esp,sp
+
+@@1:	mov	ax,cs:_seg_ds
+	mov	word ptr es:[edi+2Ch],ax
+	mov	word ptr es:[edi+2Ah],offs @@done
+
 	movzx	eax,word ptr es:[edi+1Ch]
 	movzx	ecx,word ptr es:[edi+18h]
 	movzx	edx,word ptr es:[edi+14h]
@@ -207,14 +211,15 @@ _mus_int_pm:
 	movzx	edi,word ptr es:[edi+00h]
 	pushfd
 	call	fword ptr cs:_mus_off
-	mov	esp,dptr cs:_mus_esp
-	pop	es ds
+
+	lss	esp,fword ptr cs:_mus_esp
+
+	pop	gs fs es ds
 	popad
-	lss	esp,[esp]
-	add	esp,2
 	iretd
 @@done:	mov	cs:_mus_data,0
 	retf
+
 
 
 ;=============================================================================

@@ -1279,7 +1279,7 @@ _old_int33sel	dd 0
 
 __idstring	db 'SUNSYS DOS/32A',0
 __message0	db 'SD/32A -- Protected Mode Debugger  '
-	 db 'Version 7.33',cr
+	 db 'Version 7.35',cr
 	 db 'Copyright (C) Supernar Systems, Ltd. 1996-2005',cre
 __error0 db 'SD/32A fatal: DOS/32 Advanced ADPMI is required!',cr
 	 db cr

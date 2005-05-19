@@ -211,7 +211,8 @@ _int_erravail		equ @area1_db+5Eh		;db 0
 _app_type		equ @area1_db+60h		;db 0
 _app_load		equ @area1_db+61h		;db 0
 
-_mus_esp		equ @area1_dd+64		;dd 0
+_mus_esp		equ @area1_dd+64h		;dd 0
+_mus_ss			equ @area1_dw+68h		;dw 0
 
 _app_buf_allocsel	equ @area2_dw+00h
 _app_buf_allocbase	equ @area2_dd+APP_MAXOBJECTS*2
@@ -333,7 +334,7 @@ v_msg05	db 'MB',0
 v_msg10	db 'Loading program "%s", %s-style',cre
 v_msg11	db 'Object #%d loaded at %l, V/Psize: %l/%l, Flags=%w, Sel=%w',cre
 v_msg12	db 'Startup CS:EIP=%w:%l, SS:ESP=%w:%l, %s EIP=%d:%l',cr
-	db 'Memory left: DOS=%dKB, DPMI=%d%s, PSP_Sel=%w, Env_Sel=%w, '
+	db 'Memory left: DOS=%dKB, DPMI=%d%s. PSP_Sel=%w, Env_Sel=%w, '
 	db 'Env_Seg=%w',cre
 
 

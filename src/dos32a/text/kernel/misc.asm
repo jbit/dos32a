@@ -39,16 +39,28 @@
 
 ;=============================================================================
 int15h:	cmp ah,88h			; Real mode INT 15h
-	jz @@0				; if func: 88h, need to process
+	jz @@1				; if func: 88h, need to process
+	cmp ax,0E820h
+	jz @@err
 	jmp cs:oldint15h		; no, go on to old INT 15h handler
-@@0:	pushf				; call old int 15h handler
+
+@@1:	pushf				; call old int 15h handler
 	call cs:oldint15h
 	sub ax,cs:mem_used		; adjust AX by extended memory used
-	push bp
+	jnc @@ok
+	xor ax,ax			; reset on overflow
+
+@@ok:	push bp
 	mov bp,sp
 	and byte ptr [bp+6],0FEh	; clear carry flag on stack for IRET
 	pop bp
-	iret				; return with new AX extended memory
+	iret
+
+@@err:	push bp
+	mov bp,sp
+	or byte ptr [bp+6],01h		; set carry flag on stack for IRET
+	pop bp
+	iret
 
 
 ;=============================================================================

@@ -175,8 +175,8 @@ extern	char keycode;
 		char	dos32a_buildtime[0x09];
 	};
 
-	char	*version =	"7.33";
-	int	version2 =	0x0721;
+	char*	version =	"7.35";
+	int	version2 =	0x0723;
 	int	changed	=	0;
 	int	hexmode =	0;
 

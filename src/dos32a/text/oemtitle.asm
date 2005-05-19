@@ -41,7 +41,7 @@
 ; This file is updated automatically by build.exe, do not modify!
 ;
 db	'DOS/32A'							,0,0
-db	'RX-07.XX33.2005'						,0
+db	'RX-07.XX35.2011'						,0
 db	'(C) 1996-98, 2005 by Narech Koumar.'				,0
 db	'All Rights Reserved.'						,0
 db	??date								,0

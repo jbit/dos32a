@@ -43,8 +43,8 @@
 #include <typedefs.h>
 
 
-	char *version		= "7.33";
-	char *errstr		= "SVER fatal:";
+	char*	version		= "7.35";
+	char*	errstr		= "SVER fatal:";
 
 	int fileisbound		= TRUE;
 	int extendertype	= 0;		// 1=DOS/32A, 2=STUB/32A, 3=STUB32C
@@ -155,13 +155,22 @@ void OpenFile()
 void ReadFileHeader()
 {
 	fread(&buffer,1,sizeof(buffer),fp);
-	if(ferror(fp)) err_read();
+	if(ferror(fp))
+		err_read();
 }
 
 void CheckFileFormat()
 {
-	if(strncmp(buffer,"MZ",2) == 0) { fileisbound=TRUE; return; }
-	if(strncmp(buffer,"LC",2) == 0) { fileisbound=FALSE; return; }
+	if(strncmp(buffer,"MZ",2) == 0)
+	{
+		fileisbound=TRUE;
+		return;
+	}
+	if(strncmp(buffer,"LC",2) == 0)
+	{
+		fileisbound=FALSE;
+		return;
+	}
 	err_format();
 }
 
@@ -360,7 +369,8 @@ void main(int argc, char *argv[])
 	setbuf(stdout, NULL);
 	ShowCopyright();
 
-	if(argc<2) err_usage();
+	if(argc<2)
+		err_usage();
 	if(	stricmp(argv[1],"-h") == 0 ||
 		stricmp(argv[1],"/h") == 0 ||
 		stricmp(argv[1],"-?") == 0 ||
@@ -380,5 +390,5 @@ void main(int argc, char *argv[])
 }
 
 
-/* R7-07.0300.0967 */
+/* RX-ma.miXX.NNNN */
 /* 0123456789ABCDEF  */

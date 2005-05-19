@@ -39,20 +39,20 @@
 
 #include "main.h"
 
-	char	*version = "7.33";
-	char	*errstr="SC/32A fatal:";
+	char*	version = "7.35";
+	char*	errstr="SC/32A fatal:";
 
-	char	*bindname="SB.EXE";
-	char	*tempname1="$$SC32$$.111";
-	char	*tempname2="$$SC32$$.222";
-	char	*titlename="OEMTITLE.INF";
-	char	*execstyle[]= { "LE", "LX", "LC", "PE", "PMW1" };
-	char	*stubnames[]= { "DOS32A.EXE", "STUB32A.EXE", "STUB32C.EXE" };
-	char	*encodetype[] = { "Encoded", "Stored" };
+	char*	bindname="SB.EXE";
+	char*	tempname1="$$SC32$$.111";
+	char*	tempname2="$$SC32$$.222";
+	char*	titlename="OEMTITLE.INF";
+	char*	execstyle[]= { "LE", "LX", "LC", "PE", "PMW1" };
+	char*	stubnames[]= { "DOS32A.EXE", "STUB32A.EXE", "STUB32C.EXE" };
+	char*	encodetype[] = { "Encoded", "Stored" };
 	char	dos32aenv[512];
 	char	dos32apath[512];
 
-	char	*bufptr;
+	char*	bufptr;
 	char	oldfilename[80];
 	char	newfilename[80];
 	char	inffilename[80];

@@ -540,6 +540,50 @@ r_init:	call enable_A20			; enable A20
 	mov bx,0007h			; error code 0007h
 	jc init_done			; exit if error enabling A20
 
+	push es
+
+	push ss
+	pop es
+	xor eax,eax
+	mov ebx,eax
+	mov ecx,eax
+	mov edi,eax
+
+	sub sp,32
+	mov di,sp
+
+@@0:	mov cl,20
+	mov eax,0000E820h
+	mov edx,534D4150h		; "SMAP"
+	int 15h
+	jc @@noE820			; cover all the possible
+	jcxz @@noE820			;  exit paths
+	cmp eax,534D4150h		; "SMAP"
+	jnz @@noE820
+
+	xor eax,eax
+	cmp eax,es:[di+04h]		; hiword: base address (must be 0)
+	jnz @@0
+	cmp eax,es:[di+0Ch]		; hiword: length in bytes (must be 0)
+	jnz @@0
+	inc ax
+	cmp eax,es:[di+10h]		; type: memory, available to OS (must be 1)
+	jnz @@0
+
+	mov edx,es:[di+00h]		; loword: base address
+	cmp edx,00100000h
+	jnz @@0
+	mov eax,es:[di+08h]		; loword: length in bytes
+	add edx,eax
+
+	add sp,32
+	pop es
+	jmp @@temper
+
+@@noE820:
+	add sp,32
+	pop es
+
 	xor eax,eax
 	mov ah,88h			; how much extended memory free
 	int 15h
@@ -549,17 +593,21 @@ r_init:	call enable_A20			; enable A20
 	shl eax,10			; EAX = size of memory (bytes)
 	lea edx,[eax+100000h]		; EDX = base of memory
 
+@@temper:
 	cmp eax,pm32_maxextmem		; check how much memory to alloc
 	jbe @@1				; pick lowest value
 	mov eax,pm32_maxextmem
 
-@@1:	add eax,000003FFh		; align memory to KB
-	and eax,0FFFFC00h
+@@1:	add eax, 000003FFh		; align memory to KB
+	and eax,0FFFFFC00h
 	sub edx,eax
 	mov mem_ptr,edx			; store extended memory base
 	mov mem_free,eax		; store size of extended memory
 	shr eax,10			; convert to KB
-	mov mem_used,ax			; set used memory
+	test eax,0ffff0000h
+	jz @@2
+	mov ax,0ffffh
+@@2:	mov mem_used,ax			; set used memory
 
 xr_init:                                ; XMS/raw common init tail
 	mov word ptr picslave,0870h

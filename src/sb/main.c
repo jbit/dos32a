@@ -39,7 +39,7 @@
 
 #include "main.h"
 
-	char	*version = "7.33";
+	char*	version = "7.35";
 	char	newname[80];
 	char	newname2[80];
 	char	filename[80];
@@ -177,17 +177,17 @@ void ArgInit(int argc, char *argv[])
 					if(strnicmp(argv[n]+1, args[m], strlen(args[m]))==0)
 						switch(m)
 						{
-		
+
 							case 0:	execargn++;
 								bind=TRUE;
 								stubname=stubname2;
 								goto l0;
-		
+
 							case 1:	execargn++;
 								bind=TRUE;
 								stubname=stubname3;
 								goto l0;
-		
+
 							case 2:	execargn++;
 								bind_name=TRUE;
 								strcpy(name_bn,argv[n]+3);
@@ -197,19 +197,19 @@ void ArgInit(int argc, char *argv[])
 									err_nullname();
 								}
 								goto l0;
-		
+
 							case 3:	execargn++;
 								bind=TRUE;
 								stubname=stubname2;
 								overwrite=TRUE;
 								goto l0;
-		
+
 							case 4:	execargn++;
 								bind=TRUE;
 								stubname=stubname3;
 								overwrite=TRUE;
 								goto l0;
-		
+
 							case 5:	execargn++;
 								unbind_name=TRUE;
 								strcpy(name_un,argv[n]+3);
@@ -219,40 +219,40 @@ void ArgInit(int argc, char *argv[])
 									err_nullname();
 								}
 								goto l0;
-		
+
 							case 6:	execargn++;
 								bind=TRUE;
 								stubname=stubname1;
 								goto l0;
-		
+
 							case 7:	execargn++;
 								bind=TRUE;
 								stubname=stubname1;
 								overwrite=TRUE;
 								goto l0;
-		
+
 							case 8:	execargn++;
 								unbind=TRUE;
 								goto l0;
-		
+
 							case 9:	execargn++;
 								overwrite=TRUE;
 								goto l0;
-		
+
 							case 10:	execargn++;
 								quiet=TRUE;
 								silent=FALSE;
 								goto l0;
-		
+
 							case 11:	execargn++;
 								quiet=TRUE;
 								silent=TRUE;
 								goto l0;
-		
+
 							case 12:
 							case 13:	ShowCopyright();
 								goto l1;
-		
+
 						}
 				}
 				ShowCopyright();

@@ -4,6 +4,21 @@
 
 
 
+[2005-05-19]
+DOS/32 Advanced DOS Extender, version 7.35
+==========================================
+
+DOS Extender (DOS32A.EXE):
+--------------------------
++ mouse callback code cleanup
++ allocation of up to 2Gig under Clean system (Int 15h, AX=E820h)
++ with verbose mode active and not under external DPMI the entry point
+  of application will trap to internal debugger
+
+
+
+
+
 [2005-01-12]
 DOS/32 Advanced DOS Extender version 7.33
 =========================================
