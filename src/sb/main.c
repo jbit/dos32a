@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
+ * Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -39,7 +39,7 @@
 
 #include "main.h"
 
-	char*	version = "7.35";
+	char*	version = "9.1.0";
 	char	newname[80];
 	char	newname2[80];
 	char	filename[80];
@@ -152,8 +152,8 @@ void err_environment(void) {
 /****************************************************************************/
 void ShowCopyright()
 {
-	Print("SB/32A -- Protected Mode Bind Utility  Version %s\n",version);
-	Print("Copyright (C) Supernar Systems, Ltd. 1996-2005\n");
+	Print("SB/32A -- Bind Utility version %s\n",version);
+	Print("Copyright (C) 1996-2005 by Narech Koumar @ narechk.net\n");
 }
 
 
@@ -625,7 +625,9 @@ void CheckIfExists(char *name)
 	n=open(name,O_RDWR | O_BINARY);
 	if(n!=-1)
 	{
-		close(n); if(!overwrite) err_dest(name);
+		close(n);
+		if(!overwrite)
+			err_dest(name);
 	}
 }
 int GetFileSize(char *name)

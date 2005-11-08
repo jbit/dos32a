@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -280,7 +280,6 @@ _mus_int_pm:
 	add	esp,32h
 	mov	word ptr [esp+1Ch],-1
 	jmp	@__ok
-
 
 
 PopState

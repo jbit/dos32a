@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
+ * Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -111,8 +111,8 @@ void ArgInit(int argc, char *argv[])
 	}
 
 
-	printf("SS/32A -- Protected Mode Setup Utility  Version %s\n",version);
-	printf("Copyright (C) Supernar Systems, Ltd. 1996-2005\n");
+	printf("SS/32A -- Configuration Utility version %s\n",version);
+	printf("Copyright (C) 1996-2005 by Narech Koumar @ narechk.net\n");
 
 l1:	if(argc<2)
 	{
@@ -243,7 +243,7 @@ void ShowCopyright(int argc, char *argv[])
 	SetColor(LIGHTBLUE);
 	Print_At(0,1,"DOS/32 Advanced.");
 	Print_At(0,67,"Version %s",version);
-	Print_At(24,16,"Copyright (C) Supernar Systems, Ltd. 1996-2005");
+	Print_At(24,16,"(C) 1996-2005 by Narech Koumar @ <narechk.net>");
 
 	strcpy(buf,argv[1]);
 	strupr(buf);
@@ -470,7 +470,10 @@ void ShowMemory()
 	{
 		Print_At(9,25,"%d.%02d",(id32.dos32a_version&0xFF00)>>8,id32.dos32a_version&0x00FF);
 		if((id32.dos32a_misc2&0x80)!=0x80)
-			Print_At(9,21,"Pro");
+			/* Professional */;
+			//Print_At(9,21,"Pro");
+		else
+			Print_At(9,20,"Beta");
 	}
 }
 
@@ -650,7 +653,10 @@ void ShowSysInfo()
 	SetColor(LIGHTWHITE);
 
 	n=get_cpu_type();
-	Print_At(3,24,cputab[n-3]);
+	if(n-3 > 5)
+		Print_At(3,24,"?????");
+	else
+		Print_At(3,24,cputab[n-3]);
 
 	systype=n=get_sys_type();
 	Print_At(4,22,systab[n]);

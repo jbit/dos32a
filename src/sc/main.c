@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
+ * Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -39,7 +39,7 @@
 
 #include "main.h"
 
-	char*	version = "7.35";
+	char*	version = "9.1.0";
 	char*	errstr="SC/32A fatal:";
 
 	char*	bindname="SB.EXE";
@@ -171,8 +171,8 @@ void err_environment(void) {
 /****************************************************************************/
 void ShowCopyright()
 {
-	Print("SC/32A -- Protected Mode Compress Utility  Version %s\n",version);
-	Print("Copyright (C) Supernar Systems, Ltd. 1996-2005\n");
+	Print("SC/32A -- Compression Utility version %s\n",version);
+	Print("Copyright (C) 1996-2005 by Narech Koumar @ narechk.net\n");
 }
 
 

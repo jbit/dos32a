@@ -37,10 +37,20 @@
 ;
 ;
 
+PushState
+
+
+.386p
+;=============================================================================
+load_pe_app:
+	mov	_app_type,3
 ;
-; OEM info
+; Insert PE loader implementation here
 ;
-db	'DOS/32A'							,0,0
-db	'Copyright (C) 1996-2005 by Narech Koumar'			,0
-db	??date								,0
-db	??time								,0
+	mov	ax,3004h		; "exec format not supported"
+	jmp	file_error
+
+
+
+PopState
+

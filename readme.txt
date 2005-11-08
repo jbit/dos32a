@@ -1,13 +1,13 @@
-[2005-05-19]
-DOS/32 Advanced DOS Extender, version 7.35
-Manum de tabula!
+[2005-11-08]
+DOS/32 Advanced DOS Extender, version 9.1.0
+Sic!
 
 
 Contents:
   1.0 - Synopsis
   2.0 - What's New?
   3.0 - System Requirements
-  4.0 - Distros Available
+  4.0 - DOS/32A Distributions
   5.0 - Release Notes
   6.0 - Contact
 
@@ -40,65 +40,131 @@ recent changes.
 
 
 
-4.0 - Distros Available
-=======================
+4.0 - DOS/32A Distributions
+===========================
 The following DOS/32A distributions are available:
 
-1) dos32a-710-installer.zip
-2) dos32a-735-src.zip
-3) dos32a-735-bin.zip
+1) dos32a-910-bin.zip
+2) dos32a-910-src.zip
 
 
-1) contains the original "Liberty Edition" of DOS/32A version 7.1 . It is
-the baseline for all the subsequent releases and includes an installable
-version the DOS Extender.
+1) is the binary distribution of the most recent version of DOS/32A. Contains
+precompiled binaries of the DOS Extender and its tools.
 
-2) is the source distribution of the most recent version of DOS/32A, it
-contains the source code of the DOS Extender and its tools.
-
-3) is the binary distribution containing precompiled binaries of the
-DOS Extender and its tools.
-
-DEVELOPERS:
------------
-Download all three distributions, install dos32a-710-installer.zip first,
-then upgrade by unzipping dos32a-735-src.zip and dos32a-735-bin.zip into
-DOS/32A installation folder overwriting existing files.
+2) is the source distribution of the most recent version of DOS/32A. Contains
+source code of the DOS Extender and its tools.
 
 END-USERS:
 ----------
-Download the binary distribution, dos32a-735-bin.zip, unzip into a folder
-of your choice and you are good to go (no installation is required).
+Download the latest binary distribution, dos32a-910-bin.zip, and unzip it into
+a folder of your choice. No installation is necessary.
+
+DEVELOPERS:
+-----------
+Download the latest source and binary distributions, dos32a-910-src.zip and
+dos32a-910-bin.zip, and unzip both into a folder of your choice. No installation
+is necessary. You may also want to download and install the "Liberty Edition",
+dos32a-710-installer.zip, which contains DOS/32A SDK including examples and
+documentation. Although hopelessly outdated, they may still provide a valuable
+source of information.
 
 A rather comprehensive (but regrettably outdated) set of documentation
-manuals is available on-line at http://dos32a.sourceforge.net . RTFM!
+manuals is available on-line at http://dos32a.narechk.net/manual/ . RTFM!
 
 
 
 5.0 - Release Notes (and other useless trivia)
 ==============================================
-I. DOS32A.EXE is uncompressed; do not compare its size to pmodew, wdosx, cw
-et al which *are*. This is on purpose: if storage space is scarce (eg when
-putting it into ROM or Flash memory) use your favorite exec compressor or
-write a custom one. UPX works well shaving off circa 10K. Beware: you won't
-be able to use SS.EXE config utility once DOS32A is compressed.
 
-II. StarWars came out today: it was very loud, slightly out of focus and most
-surprisingly entartaining. The "fear-hate-suffering" rhetoric is still there
-but most of ridiculousness is now replaced with non-stop action rendered in
-breathtaking CG. See this in theater (unless you're a student, unemployed or
-just generally strapped for cash, in which case BitTorrent is your friend).
+ATTENTION Developers:
+---------------------
+The exception handling code has been rewritten in order to properly support DPMI
+v0.9 specification. The changes may break code written to work exclusively with
+prior versions of DOS/32A (i.e. \examples\asm_4\simshow.asm from DOS/32A SDK
+no longer works). User-defined exception handlers should now return with RETF,
+(as mandated by DPMI spec) not IRETD instruction.
 
-III. To address whining about DOS/32A not being able to cope with >256MB under
-various ad hoc implementations of VCPI: a) learn to code, b) RTFM, it's all
-in there.
+
+The lack of time one is able to dedicate to a project is regrettable. The current
+state of DOS/32A documentation is rather disappointing and despite my importunate
+persuasions the documentation relentlessly refuses to update itself. I, on the other
+hand, am short of motivation to carry out such a tedious task myself. Nevertheless
+here are a few notes about this release and the current state of affairs:
+
+
+XMS/VCPI/DPMI detection order
+-----------------------------
+DOS/32A initialization sequence will attempt to initialize XMS even though a VCPI
+or DPMI systems may be present, unless the DOS Extender detects that it runs in
+V86/ProtectedMode. In fact, the detection code will always try the light-weight
+systems (INT 15h and XMS) first, before it goes ahead with VCPI (truly an
+abomination) and DPMI (some are very good but many are crap).
+
+The current init order is INT 15h, XMS, VCPI then DPMI. This, however is in
+conflict with the DPMI spec recommendations which suggest the reverse order.
+Extensive tests have not highlighted any problems with DOS/32A's implementation,
+but then again, empirical tests are just that: empirical. If you find any
+problems with the current setup, let me know.
+
+
+Exception/IRQ handling
+----------------------
+The rewrite of the IRQ and exception handling code should improve compatibility
+with existing applications. Because of a lot of confusion about exactly how
+it all works out in DOS/32A here is a concise rundown:
+
+	assuming default PIC mappings:
+	1) INT vectors 00..07h - can be HW exceptions (EXCs), SW interrupts (INTs)
+	2) INT vectors 08..0Fh - can be HW exceptions (EXCs), SW interrupts (INTs), HW interrupts (IRQs)
+	3) INT vectors 70..7Fh - can be SW interrupts (INTs), HW interrupts (IRQs)
+	4) all other INT vectors are SW interrupts (INTs)
+
+	unlike INTs, IRQs are auto-callbacked to Protected Mode using special "turbo-callbacks"
+	whenever a Protected Mode handler is installed
+
+	for 1, EXCs are buffered, INTs are written directly into IDT (override buffered EXCs)
+	for 2, EXCs are buffered, IRQs are buffered, INTs are sent to the corresponding EXCs handlers,
+		kernel always controls IDT entries
+	for 3, no buffering, INTs/IRQs are written directly into IDT
+	for 4, no buffering, no auto-callbacking
+
+	additionally, DOS/32A will auto-callback the following system critical INTs using
+	standard callbacks whenever a Protected Mode handler is installed:
+		INT 1Bh (CTRL-BREAK)
+		INT 1Ch (Timer)
+		INT 23h (CTRL-C)
+		INT 24h (DOS critical handler)
+
+
+Memory
+======
+DOS/32A is able to allocate and handle up to 2GB of extended memory when running
+under INT 15h (through AX=E820h with fallback to AH=88h) and XMS systems. When
+running under VCPI the DOS Extender's ability to allocate extended memory is
+limited by availability of conventional memory (e.g. below 1MB). This is because
+the DOS Extender keeps the Page Tables in conventional memory, unfortunately by
+design as in the old days some VCPI managers could fiddle the A20 gate during the
+most inappropriate times causing Page Tables in extended memory to become inaccessible.
+
+
+The Debuggers
+-------------
+The internal debugger has been removed since its utility was limited (probably only
+used by me to debug the DOS Extender itself -- a much better job can be done with
+emulators nowadays). Incidentally this fixes problems with some applications which
+inserted breakpoints along normal code-paths causing DOS/32A to break into the
+tracer continuously.
+
+Because of the changes to the exception handling code this release of DOS/32A and
+its toolkit does not include the debugger (SD.EXE). If you need it, you can try to
+backport the source code from the previous versions.
+
 
 
 
 6.0 - Contact
 =============
-WWW:   dos32a.sourceforge.net
-Email: narechk AT hotmail DOT com
+http://dos32a.narechk.net
 
 
 [EOF]

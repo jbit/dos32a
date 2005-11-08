@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -41,13 +41,28 @@
 ; Low-level debugging support for beta releases
 ;=============================================================================
 
-hexal:	push	dx
+
+;=============================================================================
+; write the contents of AL (8-bit) register to STDOUT
+;
+dbg_hexal:
+	push	dx
 	mov	dx,offs hexbuf+6
 	jmp	mkhex
-hexax:	push	dx
+
+;=============================================================================
+; write the contents of AX (16-bit) register to STDOUT
+;
+dbg_hexax:
+	push	dx
 	mov	dx,offs hexbuf+4
 	jmp	mkhex
-hexeax:	push	dx
+
+;=============================================================================
+; write the contents of EAX (32-bit) register to STDOUT
+;
+dbg_hexeax:
+	push	dx
 	mov	dx,offs hexbuf
 mkhex:	push	eax cx si di ds dx
 	smsw	si
@@ -76,12 +91,25 @@ mkhex:	push	eax cx si di ds dx
 	ret
 hextab	db '0123456789ABCDEF'
 hexbuf	db '        ',13,10
-wait:	push ax
-	xor ax,ax
-	int 16h
-	pop ax
+
+
+;=============================================================================
+; pause until a key is pressed
+;
+dbg_kbhit:
+	push	ax
+	xor	ax,ax
+	int	16h
+	pop	ax
 	ret
-@_tone:	push	ax cx dx		; AX=frequency, CX=time
+
+;=============================================================================
+; peep a sound from the speaker
+;	AX = frequency
+;	CX = time
+;
+dbg_tone:
+	push	ax cx dx
 	mov	dx,0540h
 	mov	cx,9FFFh
 	mov	al,0B6h			; set frequency
@@ -105,15 +133,3 @@ wait:	push ax
 	pop	dx cx ax
 @@done:	ret
 
-
-show_debug_string:
-	pusha
-	mov	ah,9
-	mov	dx,offset _debug_string
-	int	21h
-	popa
-	ret
-_debug_string	label byte
-db	'Kernel Module, built-in DPMI host 0.9A',0Dh,0Ah
-db	'Debug Version, build ',??date,' ',??time,0Dh,0Ah
-db	0Dh,0Ah,'$'

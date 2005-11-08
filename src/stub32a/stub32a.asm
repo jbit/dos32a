@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 Supernar Systems, Ltd. All rights reserved.
+; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -44,9 +44,7 @@
 .CODE
 ;=============================================================================
 db	'STUB/32A'							,0
-include	oemtitle.inf
-db	'(C) 1996-98, 2005 by Narech Koumar.'				,0
-db	'All Rights Reserved.'						,0
+db	'Copyright (C) 1996-2005 by Narech Koumar'			,0
 db	??date								,0
 db	??time								,0
 
