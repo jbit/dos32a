@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -550,7 +550,7 @@ r_init:	call	enable_A20		; enable A20
 	mov	di,sp
 
 @@0:	mov	cl,20
-	mov	eax,0000E820h		; try E820 allocation scheme
+	mov	eax,0000E820h		; try INT 15h, AX=0E820h allocation scheme
 	mov	edx,534D4150h		; "SMAP"
 	int	15h
 	jc	@@noE820		; cover all the possible
@@ -581,12 +581,40 @@ r_init:	call	enable_A20		; enable A20
 	add	sp,32
 	pop	es
 
-	xor	eax,eax			; try INT 15h (standard) allocation scheme
+	xor	bx,bx
+	xor	cx,cx
+	xor	dx,dx
+	mov	ax,0E801h		; try INT 15h, AX=0E801h allocation scheme
+	stc
+	int	15h
+	jc	@@noE801
+
+	mov	di,cx			; test if configured memory is > 0
+	or	di,dx
+	jz	@@useE801		; if not, use extended memory (AX,BX)
+
+	mov	ax,cx			; use configured memory (CX,DX)
+	mov	bx,dx
+
+@@useE801:
+	mov	di,ax			; test if extended memory is > 0
+	or	di,bx
+	jz	@@noE801		; if not, skip E801
+
+	movzx	eax,ax			; EBX holds extended/configured memory above 16M in 64K blocks
+	movzx	ebx,bx			; EAX holds extended/configured memory in range 1..16M in 1K blocks
+	shl	ebx,6
+	add	eax,ebx			; compute total memory as 1K blocks
+	jmp	@@calcmem
+
+@@noE801:
+	xor	eax,eax			; try INT 15h, AX=88h allocation scheme
 	mov	ah,88h			; how much extended memory free
 	int	15h
 	test	ax,ax			; if none, done with raw init
 	jz	xr_init
 
+@@calcmem:
 	shl	eax,10			; EAX = size of memory (bytes)
 	lea	edx,[eax+100000h]	; EDX = base of memory
 
@@ -768,6 +796,8 @@ vxr_init:				; VCPI/XMS/raw common init tail
 
 @@0:	clts
 
+	mov	eax,ds:[4*15h]		; preserve INT 15h
+	mov	oldint15h[edi],eax
 	mov	eax,ds:[4*1Bh]		; preserve INT 1Bh - (CTRL-Break)
 	mov	oldint1Bh[edi],eax
 	mov	eax,ds:[4*1Ch]		; preserve INT 1Ch - (timer ticks)
@@ -781,21 +811,18 @@ vxr_init:				; VCPI/XMS/raw common init tail
 	mov	eax,ds:[4*2Fh]		; preserve INT 2Fh - (Multiplex)
 	mov	oldint2Fh[edi],eax
 
-	mov	ax,cs:kernel_code	; install real mode INT 21h
+	mov	ax,cs:kernel_code	; install real mode INT 21h handler
 	shl	eax,16
-	mov	ax,offs int21h
+	mov	ax,offs int21h_rm
 	mov	ds:[4*21h],eax
 
-	mov	eax,ds:[4*15h]		; get INT 15h vector
-	mov	oldint15h[edi],eax	; store old INT 15h vector
 	cmp	cs:pmodetype,0		; is system raw?
 	jnz	@@1			; if not, we are done
 	cmp	cs:id32_process_id,0	; is this the only instance?
 	jnz	@@1			; if not, we are done
-	mov	ax,cs:kernel_code
-	shl	eax,16
-	mov	ax,offs int15h
-	mov	ds:[4*15h],eax		; install new INT 15h handler
+
+	mov	ax,offs int15h_rm
+	mov	ds:[4*15h],eax		; install real mode INT 15h handler
 
 @@1:	push	ds es edi
 	push	cs
@@ -892,8 +919,8 @@ install_ints:
 ;
 ; initialize IDT, redirect INT 21h and INT 31h
 ;
-	mov	wptr es:[8*21h],offs int21	; protected mode INT 21h
-	mov	wptr es:[8*31h],offs int31	; protected mode INT 31h
+	mov	wptr es:[8*21h],offs int21h_pm	; protected mode INT 21h
+	mov	wptr es:[8*31h],offs int31h_pm	; protected mode INT 31h
 
 	push	ds es
 	push	ds
@@ -934,7 +961,7 @@ install_ints:
 	mov	di,offs int_matrix+2	; DI = pointer into CALL matrix
 	mov	cl,15
 @@l1:	mov	ds:[di],ax		; modify CALL address
-	sub	ax,4			; PUSH + CALL = 4 byte
+	sub	ax,4			; PUSH + CALL = 4 bytes
 	add	di,4
 	loop	@@l1
 ;
@@ -946,13 +973,20 @@ install_ints:
 	movzx	dx,picslave		; install IRQ 8-15 (INT 70-77h)
 	call	setup_irqs
 ;
+; install INT 2 (special setup to handle co-proc)
+;  modify call target of INT 02h in int_matrix call table such that it points to int_main
+;
+;	mov	ax,(offs int_main) - (offs int_matrix+4) - 02h*4
+;	mov	wptr int_matrix[02h*4+2],ax	; install INT 02h (NMI)
+
+;
 ; install IRQ 7 (special setup to handle supurious signals)
 ;  modify call target of INT 0Fh in int_matrix call table such that it points to irq_normal
 ;
 	cmp	picmaster,10h		; setup IRQ 7, damn it!
 	jae	@@done
 	mov	ax,(offs irq_normal) - (offs int_matrix+4) - 0Fh*4
-	mov	wptr int_matrix[0Fh*4+2],ax	; restore INT 0Fh (IRQ 7)
+	mov	wptr int_matrix[0Fh*4+2],ax	; install INT 0Fh (IRQ 7)
 
 @@done:	ret
 

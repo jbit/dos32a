@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -175,7 +175,8 @@ int31h_end	label word
 
 
 ;=============================================================================
-int31:	cli
+int31h_pm:
+	cli
 	cld
 	push	ds es fs gs			; push registers on stack
 	pushad

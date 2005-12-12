@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -71,12 +71,12 @@ _ID32_SIZE=16		; size excluding 'ID32' signature
 ;-----------------------------------------------------------------------------
 db	'ID32'		; ID signature
 db	00111111b	; KERNEL misc. bits:
-			;   bit 0: deprecated
-			;   bit 1: deprecated
+			;   bit 0: **deprecated**
+			;   bit 1: **deprecated**
 			;   bit 2: 0=VCPI smart page alloc off, 1=on	/1=def
 			;   bit 3: 0=VCPI+XMS alloc scheme off, 1=on	/1=def
-			;   bit 4: deprecated
-			;   bit 5: deprecated
+			;   bit 4: **deprecated**
+			;   bit 5: **deprecated**
 			;   bit 6: reserved				/0=def
 			;   bit 7: 0=ignore 4G extensions off, 1=on	/0=def
 db	64		; Max. number of page tables under VCPI		/256MB
@@ -112,7 +112,7 @@ Endif
 			;   bit 6: 0=lock configuration off, 1=on	/*
 			;   bit 7: 0=Professional, 1=Beta		/*
 dw	0200h		; DOS INT 21h buffer in low memory (in para)	/8 KB
-dw	090Ah		; Internal Version of DOS/32A: db low,high
+dw	090Bh		; Internal Version of DOS/32A: db low,high
 dw	0000h		; Reserved (v7.0+)
 ;-----------------------------------------------------------------------------
 include	TEXT\oemtitle.asm

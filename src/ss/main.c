@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+ * Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -112,7 +112,7 @@ void ArgInit(int argc, char *argv[])
 
 
 	printf("SS/32A -- Configuration Utility version %s\n",version);
-	printf("Copyright (C) 1996-2005 by Narech Koumar @ narechk.net\n");
+	printf("Copyright (C) 1996-2006 by Narech Koumar @ narechk.net\n");
 
 l1:	if(argc<2)
 	{
@@ -243,7 +243,7 @@ void ShowCopyright(int argc, char *argv[])
 	SetColor(LIGHTBLUE);
 	Print_At(0,1,"DOS/32 Advanced.");
 	Print_At(0,67,"Version %s",version);
-	Print_At(24,16,"(C) 1996-2005 by Narech Koumar @ <narechk.net>");
+	Print_At(24,16,"(C) 1996-2006 by Narech Koumar @ <narechk.net>");
 
 	strcpy(buf,argv[1]);
 	strupr(buf);

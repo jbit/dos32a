@@ -3,6 +3,18 @@
 			*******************************
 
 
+[2005-12-12]
+DOS/32 Advanced DOS Extender, version 9.1.1
+===========================================
+
+DOS Extender (DOS32A.EXE):
+--------------------------
++ improved memory allocation under Clean system: INT 15h, AX=0E801h is used
+  if AX=0E820h fails (based on patch provided by Arthur Kalliokoski)
+
+
+
+
 
 [2005-11-08]
 DOS/32 Advanced DOS Extender, version 9.1.0

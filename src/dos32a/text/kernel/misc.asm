@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -39,8 +39,11 @@
 
 ; Real mode INT 15h
 ;=============================================================================
-int15h:	cmp	ah,88h			; if function 88h, need to process
+int15h_rm:
+	cmp	ah,88h			; if function 88h, need to process
 	jz	@@1
+	cmp	ax,0E801h		; if function 0E801h, not supported
+	jz	@@err
 	cmp	ax,0E820h		; if function 0E820h, not supported
 	jz	@@err
 	jmp	cs:oldint15h		; chain to the old INT 15h handler
@@ -64,13 +67,19 @@ int15h:	cmp	ah,88h			; if function 88h, need to process
 	iret
 
 
+
+; Real mode INT 21h
 ;=============================================================================
-int21h:	cmp	cs:id32_tsrmode_id,0	; if we are TSR, ignore 0FF88h calls
+int21h_rm:
+	cmp	cs:id32_tsrmode_id,0	; if we are TSR, ignore 0FF88h calls
 	jnz	@@1
+
 	cmp	ax,0FF88h		; DOS/32A id call
 	jz	int21h_call
-	cmp	cs:id32_spawned_id,0	; check if it is the mother process
-	jnz	@@1			; if not, chain to the previous handlr
+
+	cmp	cs:id32_spawned_id,0	; check if we're in spawn mode
+	jnz	@@1			; if yes, chain to the previous handler
+
 	cmp	ah,4Ch			; Real mode INT 21h
 	jz	int21h_exit
 	cmp	ah,4Bh
@@ -92,7 +101,7 @@ int21h_exit:
 	mov	edi,offs @@1
 	jmp	cs:rmtopmswrout		; switch to protected mode
 @@1:	mov	ax,bp			; restore AX=exit code
-	jmp	int21
+	jmp	int21h_pm
 
 ;-----------------------------------------------------------------------------
 int21h_spawn:
@@ -106,7 +115,7 @@ int21h_spawn:
 
 ;-----------------------------------------------------------------------------
 int21h_call:				; DOS/32A functional call (real mode)
-	mov	eax,'ID32'			; EAX = "ID32"
+	mov	eax,'ID32'		; EAX = "ID32"
 	movzx	ebx,cs:client_version	; EBX = client version
 	mov	ecx,cs:mem_free		; ECX = size of free memory
 	mov	edx,cs:mem_ptr		; EDX = base of free memory
@@ -123,31 +132,16 @@ int21h_tsr:
 
 
 
-
+; Protected mode INT 1Bh callback handler
 ;=============================================================================
-intold_save:
-	pop	bp
-	mov	ax,ds:[esi+04h]		; update FLAGS in structure
-	mov	es:[edi+20h],ax
-	mov	eax,ds:[esi+00h]	; update CS:IP in structure
-	mov	es:[edi+2Ah],eax
-	push	es edi
-	jmp	bp
-
-intold_restore:
-	pop	edi es
-	add	es:[edi+2Eh],ax
-	iretd
-
-
-
-;-----------------------------------------------------------------------------
 int1Bh:	call	intold_save
 	int	1Bh			; call protected mode INT 1Bh
 	mov	ax,6
 	jmp	intold_restore
 
-;-----------------------------------------------------------------------------
+
+; Protected mode INT 1Ch callback handler
+;=============================================================================
 int1Ch:	call	intold_save
 	push	ds
 	mov	ds,cs:selzero		; restore default INT 1Ch
@@ -163,7 +157,9 @@ int1Ch:	call	intold_save
 	mov	ax,6
 	jmp	intold_restore
 
-;-----------------------------------------------------------------------------
+
+; Protected mode INT 23h callback handler
+;=============================================================================
 int23h:	call	intold_save
 	clc
 	mov	ebp,esp
@@ -177,7 +173,9 @@ int23h:	call	intold_save
 	mov	ax,4
 	jmp	intold_restore
 
-;-----------------------------------------------------------------------------
+
+; Protected mode INT 24h callback handler
+;=============================================================================
 int24h:	call	intold_save
 	push	edi
 	push	dptr ds:[esi+1Ah]	; CS, FLG
@@ -196,6 +194,24 @@ int24h:	call	intold_save
 	mov	es:[edi+1Ch],al
 	mov	ax,6
 	jmp	intold_restore
+
+
+;-----------------------------------------------------------------------------
+intold_save:
+	pop	bp
+	mov	ax,ds:[esi+04h]		; update FLAGS in structure
+	mov	es:[edi+20h],ax
+	mov	eax,ds:[esi+00h]	; update CS:IP in structure
+	mov	es:[edi+2Ah],eax
+	push	es edi
+	jmp	bp
+
+;-----------------------------------------------------------------------------
+intold_restore:
+	pop	edi es
+	add	es:[edi+2Eh],ax
+	iretd
+
 
 
 

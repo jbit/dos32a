@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+ * Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -175,7 +175,7 @@ extern	char keycode;
 		char	dos32a_buildtime[0x09];
 	};
 
-	char*	version =	"9.1.0";
+	char*	version =	"9.1.1";
 	int	version2 =	0x0905;
 	int	changed	=	0;
 	int	hexmode =	0;

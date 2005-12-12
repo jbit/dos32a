@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+ * Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
  *
  * Redistribution  and  use  in source and  binary  forms, with or without
  * modification,  are permitted provided that the following conditions are
@@ -43,7 +43,7 @@
 #include <typedefs.h>
 
 
-	char*	version		= "9.1.0";
+	char*	version		= "9.1.1";
 	char*	errstr		= "SVER fatal:";
 
 	int		fileisbound	= TRUE;
@@ -92,7 +92,7 @@ void err_extender() {
 void ShowCopyright()
 {
 	printf("SVER -- Version Reporting Utility version %s\n",version);
-	printf("Copyright (C) 1996-2005 by Narech Koumar @ narechk.net\n");
+	printf("Copyright (C) 1996-2006 by Narech Koumar @ narechk.net\n");
 }
 
 

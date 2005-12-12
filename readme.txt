@@ -1,6 +1,6 @@
-[2005-11-08]
-DOS/32 Advanced DOS Extender, version 9.1.0
-Sic!
+[2005-12-12]
+DOS/32 Advanced DOS Extender, version 9.1.1
+Diebus fatalibus!
 
 
 Contents:
@@ -34,7 +34,7 @@ recent changes.
 =========================
 . IBM PC compatible hardware
 . 80386 processor or better
-. 1 MB of memory (up to 2Gig supported)
+. 1 MB of memory (up to 2 GB supported)
 . DOS version 4.0 or higher
 . VGA compatible graphics card
 
@@ -44,8 +44,8 @@ recent changes.
 ===========================
 The following DOS/32A distributions are available:
 
-1) dos32a-910-bin.zip
-2) dos32a-910-src.zip
+1) dos32a-911-bin.zip
+2) dos32a-911-src.zip
 
 
 1) is the binary distribution of the most recent version of DOS/32A. Contains
@@ -56,13 +56,13 @@ source code of the DOS Extender and its tools.
 
 END-USERS:
 ----------
-Download the latest binary distribution, dos32a-910-bin.zip, and unzip it into
+Download the latest binary distribution, dos32a-911-bin.zip, and unzip it into
 a folder of your choice. No installation is necessary.
 
 DEVELOPERS:
 -----------
-Download the latest source and binary distributions, dos32a-910-src.zip and
-dos32a-910-bin.zip, and unzip both into a folder of your choice. No installation
+Download the latest source and binary distributions, dos32a-911-src.zip and
+dos32a-911-bin.zip, and unzip both into a folder of your choice. No installation
 is necessary. You may also want to download and install the "Liberty Edition",
 dos32a-710-installer.zip, which contains DOS/32A SDK including examples and
 documentation. Although hopelessly outdated, they may still provide a valuable
@@ -78,18 +78,19 @@ manuals is available on-line at http://dos32a.narechk.net/manual/ . RTFM!
 
 ATTENTION Developers:
 ---------------------
-The exception handling code has been rewritten in order to properly support DPMI
-v0.9 specification. The changes may break code written to work exclusively with
-prior versions of DOS/32A (i.e. \examples\asm_4\simshow.asm from DOS/32A SDK
-no longer works). User-defined exception handlers should now return with RETF,
-(as mandated by DPMI spec) not IRETD instruction.
+Since DOS/32A v9.1.0 the exception handling code has been rewritten in order to
+properly support DPMI v0.9 specification. The changes may break code written to
+work exclusively with prior versions of DOS/32A (i.e. \examples\asm_4\simshow.asm
+from the ancient DOS/32A SDK v7.1 no longer works). User-defined exception handlers
+should now return with RETF (as mandated by DPMI spec), not IRETD instruction.
 
 
-The lack of time one is able to dedicate to a project is regrettable. The current
-state of DOS/32A documentation is rather disappointing and despite my importunate
-persuasions the documentation relentlessly refuses to update itself. I, on the other
-hand, am short of motivation to carry out such a tedious task myself. Nevertheless
-here are a few notes about this release and the current state of affairs:
+Building DOS/32A
+----------------
+The source distribution of DOS/32A only includes the source code (*.asm and *.c files)
+of the most recent version of the DOS Extender. Download and install DOS/32A SDK v7.1
+(dos32a-710-installer.zip) which provides the build environment, instructions and
+necessary files.
 
 
 XMS/VCPI/DPMI detection order
@@ -136,14 +137,14 @@ it all works out in DOS/32A here is a concise rundown:
 		INT 24h (DOS critical handler)
 
 
-Memory
-======
+Memory Allocation
+-----------------
 DOS/32A is able to allocate and handle up to 2GB of extended memory when running
-under INT 15h (through AX=E820h with fallback to AH=88h) and XMS systems. When
-running under VCPI the DOS Extender's ability to allocate extended memory is
-limited by availability of conventional memory (e.g. below 1MB). This is because
-the DOS Extender keeps the Page Tables in conventional memory, unfortunately by
-design as in the old days some VCPI managers could fiddle the A20 gate during the
+under INT 15h (through AX=0E820h with fallback to AX=0E801h, then AH=88h) and XMS
+systems. When running under VCPI the DOS Extender's ability to allocate extended
+memory is limited by availability of conventional memory (e.g. below 1MB). This is
+because the DOS Extender keeps the Page Tables in conventional memory, unfortunately
+by design as in the old days some VCPI managers could fiddle with A20 gate during the
 most inappropriate times causing Page Tables in extended memory to become inaccessible.
 
 
@@ -164,7 +165,7 @@ backport the source code from the previous versions.
 
 6.0 - Contact
 =============
-http://dos32a.narechk.net
+http://dos32a.narechk.net/
 
 
 [EOF]

@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2005 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -41,7 +41,8 @@
 ; Exit Protected Mode
 ;=============================================================================
 
-int21:	cmp	ah,4Ch			; watch for INT 21h AH=4Ch
+int21h_pm:
+	cmp	ah,4Ch			; watch for INT 21h AH=4Ch
 	jne	@@done
 
 	cli
@@ -129,12 +130,12 @@ v_exit:	mov	cx,vcpi_allocmem	; check if memory was allocated
 	mov	esi,pagetablefree
 	jcxz	xms_dealloc		; if no VCPI memory was allocated, try XMS
 
-@@1:	mov	edx,es:[esi]
+@@0:	mov	edx,es:[esi]
 	add	esi,4
 	and	dx,0F000h
 	mov	ax,0DE05h
 	call	fptr vcpi_calleip
-	loop	@@1
+	loop	@@0
 
 	mov	eax,vcpi_cr3		; reload CR3 to flush page cache
 	mov	cr3,eax
