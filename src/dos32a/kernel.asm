@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -36,6 +36,9 @@
 ; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;
 ;
+
+BUILDING_KERNEL = 1
+BUILDING_CLIENT = 0
 
 ;*****************************************************************************
 ; DOS/32 Advanced DOS Extender master Kernel file, includes kernel definitions
@@ -260,7 +263,14 @@ include	TEXT\KERNEL\misc.asm
 include	TEXT\KERNEL\mode.asm
 include	TEXT\KERNEL\intr.asm
 include	TEXT\KERNEL\int31h.asm
-;include TEXT\KERNEL\test.asm
+
+
+;=============================================================================
+; BETA test code
+
+If EXEC_TYPE eq 2
+include	TEXT\testbeta.asm
+Endif
 
 	Align 16
 @kernel_end	label byte

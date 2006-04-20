@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -429,7 +429,8 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 ;
 @__4402h:
 @__4404h:
-@__3Fh:	push	ds
+@__3Fh:
+	push	ds
 	pop	es
 	mov	ds,cs:_sel_ds			; DS=_TEXT16
 	sub	esp,32h
@@ -456,13 +457,17 @@ _ctrl_c:mov	ax,4CFFh	; exit on CTRL-C with code 255
 	test	bptr [ebp+20h],1		; check for error
 	jnz	@@err
 
-	test	ax,ax
-	jz	@@done				; if 0 bytes read, we're done
+	test	ax,ax				; if read 0 bytes
+	jz	@@done				;  then we're done
 
 	mov	esi,_lobufbase			; DS:ESI=source
 	call	@__cp2				; copy buffer to destination
 
 	add	edx,eax				; adjust bytes read
+
+	cmp	wptr [ebp+10h],0		; if was reading from stdin
+	jz	@@done				;  then we're done
+
 	sub	ebx,eax				; adjust bytes to read
 	mov	ax,[ebp+1Ch+32h]
 	ja	@@loop

@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -92,7 +92,7 @@ dw	0000h		; Internal Version of DOS/32A (N/A for stub)
 dw	0000h		; Reserved (v7.0+)
 ;-----------------------------------------------------------------------------
 db	'STUB/32C'							,0
-db	'Copyright (C) 1996-2006 by Narech Koumar'			,0
+db	'Copyright (C) 1996-2006 by Narech K.'				,0
 db	??date								,0
 db	??time								,0
 

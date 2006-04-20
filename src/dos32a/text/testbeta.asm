@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -39,6 +39,11 @@
 
 ;=============================================================================
 ; Low-level debugging support for beta releases
+;
+; Note: this code is shared between CLIENT & KERNEL; whenever there is a need
+;	to differentiate between the two (seg/sel regs and such), use the
+;	BUILDING_KERNEL and BUILDING_CLIENT macro symbols
+;
 ;=============================================================================
 
 
@@ -61,32 +66,47 @@ dbg_hexax:
 ;=============================================================================
 ; write the contents of EAX (32-bit) register to STDOUT
 ;
+; works from real & protected modes, should be fairly transparent to the app
+;
 dbg_hexeax:
 	push	dx
 	mov	dx,offs hexbuf
 mkhex:	push	eax cx si di ds dx
 	smsw	si
 	test	si,1
-	jz	@@a
+	jz	@@0
+;
+; TODO: rewrite this shit pronto! (in particular avoid memory r/w access a la CLIENT/strings.asm)
+;
+
+If BUILDING_KERNEL eq 0
+	mov	ds,cs:_sel_ds
+	jmp	@@1
+@@0:	mov	ds,cs:_seg_ds
+Else
 	mov	ds,cs:seldata
-	jmp	@@b
-@@a:	mov	ds,cs:kernel_code
-@@b:	mov	di,7
-@@0:	mov	si,ax
+	jmp	@@1
+@@0:	mov	ds,cs:kernel_code
+Endif
+
+@@1:	mov	di,7
+
+@@cvt:	mov	si,ax
 	and	si,000Fh
 	mov	cl,cs:hextab[si]
 	mov	ds:hexbuf[di],cl
 	shr	eax,4
 	dec	di
-	jns	@@0
+	jns	@@cvt
 	pop	si
-	mov	cx,offset hexbuf+10
+
+	mov	cx,offs hexbuf+10
 	sub	cx,si
-@@c:	lodsb
+@@loop:	lodsb
 	mov	dl,al
 	mov	ah,2
 	int	21h
-	loop	@@c
+	loop	@@loop
 	pop	ds di si cx eax dx
 	ret
 hextab	db '0123456789ABCDEF'
@@ -96,6 +116,8 @@ hexbuf	db '        ',13,10
 ;=============================================================================
 ; pause until a key is pressed
 ;
+; note: this switches CPU to real mode (BIOS Fn Int16h/AX=0)
+;
 dbg_kbhit:
 	push	ax
 	xor	ax,ax
@@ -104,32 +126,70 @@ dbg_kbhit:
 	ret
 
 ;=============================================================================
-; peep a sound from the speaker
+; beep a sound from the PC speaker
 ;	AX = frequency
 ;	CX = time
 ;
-dbg_tone:
-	push	ax cx dx
-	mov	dx,0540h
-	mov	cx,9FFFh
+dbg_beep:
+@@0:	push	cx dx ax		; AX=frequency, CX=time
 	mov	al,0B6h			; set frequency
 	out	43h,al
-	mov	al,dl			; fLow
-	out	42h,al
-	mov	al,dh			; fHigh
-	out	42h,al
+	pop	ax
+	out	42h,al			; fLow
+	mov	al,ah
+	out	42h,al			; fHigh
 	in	al,61h			; beep on
 	or	al,03h
 	out	61h,al
-@@loop:	mov	ax,0001h
-	cwd
-	div	ax
-	div	ax
-	div	ax
+@@loop:	in	al,40h
+	in	al,40h
+	mov	ah,al
+@@1:	in	al,40h
+	in	al,40h
+	cmp	ah,al
+	je	@@1
 	loop	@@loop
 	in	al,61h			; beep off
 	and	al,not 03h
 	out	61h,al
-	pop	dx cx ax
-@@done:	ret
+	pop	dx cx
+	ret
+
+;=============================================================================
+; halt execution forever
+;
+; this blocks app execution in an endless loop, with predicate AX being tested
+; for being zero; the state of AX is then expected to be changed by an external
+; debugger (i.e. from an emulator) so that debugging can proceed from that point
+;
+dbg_halt:
+	pushf
+	cli
+	push	ax
+	xor	ax,ax
+@@loop:	test	ax,ax
+	jz	@@loop
+	pop	ax
+	sti
+	popf
+	ret
+
+;=============================================================================
+; convinience fn: peep a beep, then die a little in hope of a better future
+;
+; real men don't use no hardware debuggers!
+;
+dbg_break:
+	pushf
+	push	ax cx
+	mov	cx,0200h
+	mov	ax,0500h
+	call	dbg_beep
+	mov	ax,0100h
+	call	dbg_beep
+	mov	ax,0500h
+	call	dbg_beep
+	pop	cx ax
+	popf
+	jmp	dbg_halt
 

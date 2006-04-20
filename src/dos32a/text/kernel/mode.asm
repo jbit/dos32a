@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -42,8 +42,17 @@
 ;=============================================================================
 
 ;=============================================================================
+; VCPI real mode to protected mode switch
+;
+;	AX = protected mode DS
+;	CX = protected mode ES
+;	DX = protected mode SS
+;	EBX = protected mode stack pointer
+;	ESI = protected mode target CS
+;	EDI = protected mode target IP
+;
 	Align 4
-v_rmtopmsw:				; VCPI real to protected switch
+v_rmtopmsw:
 	pushf				; store FLAGS
 	cli
 	mov	ds,cs:kernel_code	; DS = _KERNEL
@@ -69,18 +78,27 @@ v_rmtopmswpm:
 	push	edi			; store protected mode target EIP
 	iretd				; go to targed addx in protected mode
 
-;-----------------------------------------------------------------------------
+;=============================================================================
+; VCPI protected mode to real mode switch
+;
+;	AX = real mode DS
+;	CX = real mode ES
+;	DX = real mode SS
+;	BX = real mode stack pointer
+;	SI = real mode target CS
+;	DI = real mode target IP
+;
 	Align 4
-v_pmtormsw:				; VCPI protected to real switch
+v_pmtormsw:
 	pushf				; store FLAGS
 	cli
 	push	ax			; store AX (real mode DS)
 	mov	ds,cs:selzero		; DS -> 0 (beginning of memory)
-	and	ebx,0FFFFh		; clear high word of EBX, real mode SP
+	movzx	ebx,bx			; clear high word of EBX, real mode SP
 	mov	eax,cs:vcpiswitchstack	; EAX -> top of temporary switch stack
-	and	edx,0FFFFh		; clear high word of EDX, real mode SS
+	movzx	edx,dx			; clear high word of EDX, real mode SS
 	mov	dptr ds:[eax+32],0	; store real mode GS
-	and	ecx,0FFFFh		; clear high word of ECX, real mode ES
+	movzx	ecx,cx			; clear high word of ECX, real mode ES
 	mov	dptr ds:[eax+28],0	; store real mode FS
 	mov	ds:[eax+20],ecx		; store real mode ES
 	pop	cx			; move real mode DS from protected
@@ -101,8 +119,17 @@ v_pmtormsw:				; VCPI protected to real switch
 
 
 ;=============================================================================
+; XMS/RAW real mode to protected mode switch
+;
+;	AX = protected mode DS
+;	CX = protected mode ES
+;	DX = protected mode SS
+;	EBX = protected mode stack pointer
+;	ESI = protected mode target CS
+;	EDI = protected mode target IP
+;
 	Align 4
-xr_rmtopmsw:				; XMS/raw real to protected switch
+xr_rmtopmsw:
 	pushfd				; store EFLAGS
 	cli
 	push	ax			; store AX (protected mode DS)
@@ -127,28 +154,36 @@ xr_rmtopmsw:				; XMS/raw real to protected switch
 	push	eax			; store old EFLAGS
 	push	esi			; store protected mode target CS
 	push	edi			; store protected mode target EIP
-	iretd				; go to targed addx in protected mode
+	iretd				; go to target addx in protected mode
 
-;-----------------------------------------------------------------------------
+;=============================================================================
+; XMS/RAW protected mode to real mode switch
+;
+;	AX = real mode DS
+;	CX = real mode ES
+;	DX = real mode SS
+;	BX = real mode stack pointer
+;	SI = real mode target CS
+;	DI = real mode target IP
+;
 	Align 4
-xr_pmtormsw:				; XMS/raw protected to real switch
+xr_pmtormsw:
 	pushf				; store FLAGS
 	cli
 	push	ax			; store AX (real mode DS)
 	mov	ds,cs:seldata		; DS -> 0 (beginning of memory)
 	pop	tempw0			; move real mode DS from stack to temp
 	pop	tempw1			; move FLAGS from stack to temp
-	xor	esp,esp
 	mov	ax,SELDATA		; load descriptors with real mode seg
 	mov	ds,ax			;  attributes
 	mov	es,ax
 	mov	fs,ax
 	mov	gs,ax
 	mov	ss,ax			; load descriptor with real mode attr
-	mov	sp,bx			; load real mode SP, high word 0
+	movzx	esp,bx			; load real mode SP, high word 0
 	lidt	fptr rmidtlimit		; load real mode IDT
 	mov	eax,cr0			; switch to real mode
-	and	al,0FEh
+	and	al,0FEh			; turn off protected mode
 	mov	cr0,eax
 	db 0EAh				; JMP FAR PTR _KERNEL:$+4
 	dw $+4,_KERNEL			;  (clear prefetch que)
@@ -165,8 +200,8 @@ xr_pmtormsw:				; XMS/raw protected to real switch
 
 
 ;=============================================================================
-vxr_saverestorepm:			; VCPI/XMS/raw save/restore status
+vxr_saverestorepm:			; VCPI/XMS/RAW save/restore status
 	db 66h				; no save/restore needed, 32bit RETF
-vxr_saverestorerm:			; VCPI/XMS/raw save/restore status
+vxr_saverestorerm:			; VCPI/XMS/RAW save/restore status
 	retf				; no save/restore needed, 16bit RETF
 

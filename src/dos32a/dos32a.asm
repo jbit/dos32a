@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -36,6 +36,9 @@
 ; ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ;
 ;
+
+BUILDING_KERNEL = 0
+BUILDING_CLIENT = 1
 
 ;*****************************************************************************
 ; DOS/32 Advanced DOS Extender master Client file, implements program entry
@@ -112,7 +115,7 @@ Endif
 			;   bit 6: 0=lock configuration off, 1=on	/*
 			;   bit 7: 0=Professional, 1=Beta		/*
 dw	0200h		; DOS INT 21h buffer in low memory (in para)	/8 KB
-dw	090Bh		; Internal Version of DOS/32A: db low,high
+dw	090Ch		; Internal Version of DOS/32A: db low,high
 dw	0000h		; Reserved (v7.0+)
 ;-----------------------------------------------------------------------------
 include	TEXT\oemtitle.asm
@@ -447,25 +450,27 @@ remove_kernel:
 
 
 
-;	DATA
 ;=============================================================================
+; DATA
+
 include	TEXT\CLIENT\data.asm
 
 
-$theend	proc near
-If EXEC_TYPE eq 0
-	db 2 dup(00h)
-Else
-	db 2 dup(00h)
-Endif
-$theend	endp
+;=============================================================================
+; BETA test code
 
+If EXEC_TYPE eq 2
+include	TEXT\testbeta.asm
+Endif
+
+	Align 16
 @text16_end	label byte
 _TEXT16	ends
 
 
 
 ;=============================================================================
+; STACK
 _STACK	segment para stack use16 'STACK'
 	db	STACKSIZE*16 dup(?)
 _STACK	ends

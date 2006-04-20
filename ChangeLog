@@ -1,6 +1,27 @@
-			*******************************
-			*** DOS/32 Advanced Updates ***
-			*******************************
+			*****************************************
+			*** DOS/32A DOS Extender -- ChangeLog ***
+			*****************************************
+
+
+[2006-04-20]
+DOS/32 Advanced DOS Extender, version 9.1.2
+===========================================
+
+DOS Extender (DOS32A.EXE):
+--------------------------
++ Bugfix: Int 21h function 3Fh refused to return when reading from STDIN
+  (reported by Gianni Gallucci)
+
++ Bugfix: in irq_fail fn, hardware exception #9 doesn't have exception code
+  (reported by Charles Hyde)
+
++ applied mode.asm patch (also by Charles Hyde from Infineon) with minor
+  formatting changes; I'm rather ambivalent about implementing the others
+  into the mainstream builds (in particular the PAE one), will make those
+  available from the development (beta) page...
+
+
+
 
 
 [2005-12-12]

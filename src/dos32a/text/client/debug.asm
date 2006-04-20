@@ -1,5 +1,5 @@
 ;
-; Copyright (C) 1996-2006 by Narech Koumar. All rights reserved.
+; Copyright (C) 1996-2006 by Narech K. All rights reserved.
 ;
 ; Redistribution  and  use  in source and  binary  forms, with or without
 ; modification,  are permitted provided that the following conditions are
@@ -483,7 +483,7 @@ dump_regs:
 	add	bx,4
 	call	loadl_ss_esp
 	push	eax				; STK[8]
-	push	ms_reg_cr2			; CR0
+	push	ms_reg_cr2			; CR2
 	push	dptr [ebp+08h]			; EBP
 	push	dptr [ebp+18h]			; ECX
 	mov	dx,offs dbgmsg6
